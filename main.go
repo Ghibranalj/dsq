@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"runtime/debug"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -162,9 +163,9 @@ func dumpJSONFile(file string, pretty bool, schema bool) error {
 	return nil
 }
 
-var Version = "latest"
+var version = "latest"
 
-var HELP = `dsq (Version ` + Version + `) - commandline SQL engine for data files
+var HELP = `dsq (Version ` + version + `) - commandline SQL engine for data files
 
 Usage:  dsq [file...] $query
         dsq $file [query]
@@ -191,6 +192,11 @@ Examples:
 See the repo for more details: https://github.com/multiprocessio/dsq.`
 
 func _main() error {
+	buildinfo, ok := debug.ReadBuildInfo()
+	if ok {
+		version = buildinfo.Main.Version
+	}
+	
 	log.SetFlags(0)
 	runner.Verbose = false
 	var nonFlagArgs []string
@@ -219,7 +225,7 @@ func _main() error {
 		}
 
 		if arg == "-v" || arg == "--version" {
-			log.Println("dsq " + Version)
+			log.Println("dsq " + version)
 			return nil
 		}
 
